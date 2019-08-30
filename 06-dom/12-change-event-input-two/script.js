@@ -15,11 +15,9 @@
     // your code here
     document.getElementById("pass-one").addEventListener("input", function () {
         userInput = document.getElementById("pass-one").value;
-        if (userInput.length >= 8){
-            let enoughDigits = regEX.test(userInput);
-            if (enoughDigits === true){
-                document.getElementById("validity").innerHTML = "ok"
-            }
+        let enoughDigits = regEX.test(userInput);
+        if (userInput.length >= 8 && enoughDigits === true){
+                document.getElementById("validity").innerHTML = "ok";
         }
         else document.getElementById("validity").innerHTML = "Not ok"
     })

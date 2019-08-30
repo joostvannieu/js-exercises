@@ -19,8 +19,6 @@
         "</style>";
     let waveString = document.getElementById("target").innerText.split("");
     let html = "";
-    //let wrapper = document.createElement("div");
-    //let el = document.getElementById("target");
 
     for (let i = 0; i < waveString.length;){
         let ud = 0;
@@ -35,8 +33,6 @@
     }
 
     document.getElementsByTagName("head").item(0).innerHTML += style;
-    //document.getElementById("target").parentNode.insertBefore(wrapper, el);
-    //wrapper.appendChild(el);
     document.getElementById("target").innerHTML = html;
 
 })();
