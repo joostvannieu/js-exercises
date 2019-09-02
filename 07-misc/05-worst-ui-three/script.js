@@ -42,7 +42,7 @@
     function getValue(label){
         let min = label.getAttribute("data-min");
         let max = label.getAttribute("data-max");
-        let value = Math.floor(Math.random()*(max-min)) + parseInt(min);
+        let value = Math.floor(Math.random()*(max-min+1)) + parseInt(min);
         return value;
     }
     //

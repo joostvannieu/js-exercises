@@ -17,7 +17,7 @@
     function happy (){
         document.getElementById("target").innerHTML += charArray.shift();
     }
-    for (let i = 0; i<charArray.length; i++)
-        setTimeout(happy, Math.floor(Math.random()*10000))
-
+    for (let i = 0; i<charArray.length; i++) {
+        setTimeout(happy, Math.floor(Math.random() * 10000))
+    }
 })();
