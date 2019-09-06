@@ -11,7 +11,7 @@
 
 (() => {
     // your code here
-    let posts, comment;
+    let comment;
     document.getElementById("run").addEventListener("click", function () {
         //combined = {id, title, content, author, comment:[content, author]};
         window.lib.getPosts(function (error, posts) {
@@ -22,8 +22,8 @@
                     if (comment !== undefined) {
                         //console.log(`Comment: ${Object.entries(comment)}`);
                         post.comment= comment;
-                        console.log(post);
                     }
+                    console.log(post);
                 })
             })
         });
