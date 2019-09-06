@@ -1,4 +1,5 @@
 (function () {
+    //CLASSES
     //Class for cards, cards have 2 properties: a suit and a value
     class Card{
         constructor(suit, value){
@@ -58,18 +59,7 @@
             this._isDealer = false;
             this._handValue = 0;
         }
-        /*get _name(){
-            return this._name;
-        }
-        get _hand(){
-            return this._hand;
-        }
-        set _name(newName){
-            this._name = newName;
-        }
-        set _hand(newHand){
-            this._hand = newHand;
-        }*/
+
         calculateHandValue(){
             let handValue = 0, handHasCards = false;
 
@@ -95,14 +85,9 @@
             this._handValue = handValue;
         }
     }
+    //Classes END
 
-    let playerNames = ['player1','dealer'], players = [], currentPlayer;
-    const myDeck = new Deck();
-    const INITIAL_DEAL = 2; //hand size after initial deal of cards
-
-    //Make deck ready for game
-    myDeck.shuffleDeck();
-
+    //FUNCTIONS
     //Create players
     function createPlayers() {
         playerNames.forEach(function (playerName) {
@@ -122,12 +107,77 @@
         }
     }
 
-    //
+    //Calculate hand values for all players
+    function calculateAllHandValues(){
+        players.forEach(function (player){
+            player.calculateHandValue()
+        })
+    }
 
+    //Check for naturals
+    function checkNaturals(){
+        let hasNaturals = [];
+        players.forEach(function (player) {
+            if (player._handValue === 21){hasNaturals.push(player)}
+        });
+        hasNaturals.forEach(function (player, index){
+            if (player._isDealer && index === 0){
+                roundEnd = true;
+                console.log(player._name + ' wins with ' + player._hand[0]._suit.toString() + player._hand[0]._value.toString() + ' ' + player._hand[1]._suit.toString() + player._hand[1]._value.toString())
+            } else if (!player._isDealer && hasNaturals[hasNaturals.length-1]._isDealer){
+                console.log(player._name + ' draws ' + player._hand[0]._suit.toString() + player._hand[0]._value.toString() + ' ' + player._hand[1]._suit.toString() + player._hand[1]._value.toString())
+            } else if (!player._isDealer && !hasNaturals[hasNaturals.length-1]._isDealer){
+                console.log(player._name + ' wins with ' + player._hand[0]._suit.toString() + player._hand[0]._value.toString() + ' ' + player._hand[1]._suit.toString() + player._hand[1]._value.toString())
+            }
+        });
+    }
+
+    //Reset for next round
+    function reset(){
+        players.forEach(function (player) {
+            player._hand = [];
+            player.calculateHandValue();
+        })
+    }
+
+    //Play another round?
+    function playAgain(){
+        playEnd = !confirm('Play Again');
+        if (myDeck._cards.length <= 10){
+            console.log('new deck');
+            myDeck = new Deck();
+            myDeck.shuffleDeck();
+        }
+        if (playEnd){
+            console.log('thanks for playing')
+        }
+    }
+
+    //print players to console, just for checking
+    function printPlayers(){
+        players.forEach(function (player) {
+            console.log(player);
+        })
+    }
+
+    //VARIABLES
+    let playerNames = ['player1','dealer'], players = [], currentPlayer;
+    var myDeck = new Deck();
+    const INITIAL_DEAL = 2; //hand size after initial deal of cards
+    let roundEnd = false, playEnd = false;
+
+    //RUN SEQUENCE
     createPlayers();
-    currentPlayer = players[0];
-    dealInitialHands();
-    currentPlayer.calculateHandValue();
-    console.log(currentPlayer);
+    myDeck.shuffleDeck(); //Make deck ready for game
+    //While game is ongoing and Deck has at least 10 cards
+    do {
+        dealInitialHands();
+        calculateAllHandValues();
+        printPlayers();
+        checkNaturals();
+        playAgain();
+        reset();
+    } while (!playEnd && myDeck._cards.length > 10)
+
 
 })();
