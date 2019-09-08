@@ -98,6 +98,15 @@
         addToCurrentRound(){
             this._playingTheRound = true;
         }
+        hit(){
+            if (myDeck._cards.length <= RESERVE_CARDS) {
+                console.log('new deck');
+                myDeck = new Deck();
+                myDeck.shuffleDeck();
+            }
+            this._hand.push(myDeck.dealCard());
+            console.log(this.showHand());
+        }
     }
     //Classes END
 
@@ -140,7 +149,7 @@
                 console.log(player._name + ' wins with ' + player.showHand())
             } else if (!player._isDealer && hasNaturals[hasNaturals.length-1]._isDealer){ //both the house and one or more players draw 21, round ends
                 if (hasNaturals.length === players.length){roundEnd = true}
-                console.log(player._name + ' draws ' + player.showHand())
+                console.log(player._name + ' pushes with ' + player.showHand())
             } else if (!player._isDealer && !hasNaturals[hasNaturals.length-1]._isDealer){ //one or more players, not the house, wins, those players win, but if there are still other players, the round continues with them
                 if (hasNaturals.length === players.length-1){roundEnd = true} //all players except the dealer have 21, round ends
                 player.removeFromCurrentRound(); //set a winning player to no longer playing the current round
@@ -162,10 +171,11 @@
     //Play another round?
     function playAgain(){
         playEnd = !confirm('Play Again');
-        if (myDeck._cards.length <= 10){
+        if (myDeck._cards.length <= RESERVE_CARDS){
             console.log('new deck');
             myDeck = new Deck();
             myDeck.shuffleDeck();
+            reset();
         }
         if (playEnd){
             console.log('thanks for playing')
@@ -175,14 +185,21 @@
     //print players to console, just for checking
     function printPlayers(){
         players.forEach(function (player) {
-            console.log(player);
+            if (!player._isDealer){
+                console.log(player._name + ' has: ' + player.showHand());
+            }
+            else {
+                console.log(player._name + ' has: ' + player._hand[0]._suit + player._hand[0]._value);
+            }
+
         })
     }
 
     //VARIABLES
     let playerNames = ['player1','dealer'], players = [], currentPlayer;
-    var myDeck = new Deck();
+    let myDeck = new Deck();
     const INITIAL_DEAL = 2; //hand size after initial deal of cards
+    const RESERVE_CARDS = 10;
     let roundEnd = false, playEnd = false;
 
     //RUN SEQUENCE
@@ -194,8 +211,25 @@
         calculateAllHandValues();
         printPlayers();
         checkNaturals();
-        playAgain();
-        reset();
+        if (roundEnd) {playAgain(reset())}
+        else{
+            //check hit or stand for players in round
+            players.forEach(function (player) {
+                while (player._playingTheRound && !player._isDealer && player._handValue <=21){
+                    if (confirm(player._name + ' Hit (Ok) or stand (Cancel)')){
+                        player.hit();
+                        player.showHand();
+                        player.calculateHandValue();
+                    } else {
+                        player.showHand();
+                        player.calculateHandValue();
+                        player.removeFromCurrentRound();
+                        console.log(player._name + ' stands')
+                    }
+                }
+            });
+            playAgain(reset()); //temporary placeholder
+        }
     } while (!playEnd)
 
 
