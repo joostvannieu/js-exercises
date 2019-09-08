@@ -58,6 +58,7 @@
             this._hand = [];
             this._isDealer = false;
             this._handValue = 0;
+            this._playingTheRound = true;
         }
 
         calculateHandValue(){
@@ -83,6 +84,19 @@
                 });
             }
             this._handValue = handValue;
+        }
+        showHand(){
+            let hand='';
+            this._hand.forEach(function (card) {
+                hand += card._suit.toString() + card._value.toString() + " ";
+            });
+            return hand;
+        }
+        removeFromCurrentRound(){
+            this._playingTheRound = false;
+        }
+        addToCurrentRound(){
+            this._playingTheRound = true;
         }
     }
     //Classes END
@@ -121,13 +135,16 @@
             if (player._handValue === 21){hasNaturals.push(player)}
         });
         hasNaturals.forEach(function (player, index){
-            if (player._isDealer && index === 0){
+            if (player._isDealer && index === 0){ //house is the only player with 21, so house wins, round ends
                 roundEnd = true;
-                console.log(player._name + ' wins with ' + player._hand[0]._suit.toString() + player._hand[0]._value.toString() + ' ' + player._hand[1]._suit.toString() + player._hand[1]._value.toString())
-            } else if (!player._isDealer && hasNaturals[hasNaturals.length-1]._isDealer){
-                console.log(player._name + ' draws ' + player._hand[0]._suit.toString() + player._hand[0]._value.toString() + ' ' + player._hand[1]._suit.toString() + player._hand[1]._value.toString())
-            } else if (!player._isDealer && !hasNaturals[hasNaturals.length-1]._isDealer){
-                console.log(player._name + ' wins with ' + player._hand[0]._suit.toString() + player._hand[0]._value.toString() + ' ' + player._hand[1]._suit.toString() + player._hand[1]._value.toString())
+                console.log(player._name + ' wins with ' + player.showHand())
+            } else if (!player._isDealer && hasNaturals[hasNaturals.length-1]._isDealer){ //both the house and one or more players draw 21, round ends
+                if (hasNaturals.length === players.length){roundEnd = true}
+                console.log(player._name + ' draws ' + player.showHand())
+            } else if (!player._isDealer && !hasNaturals[hasNaturals.length-1]._isDealer){ //one or more players, not the house, wins, those players win, but if there are still other players, the round continues with them
+                if (hasNaturals.length === players.length-1){roundEnd = true} //all players except the dealer have 21, round ends
+                player.removeFromCurrentRound(); //set a winning player to no longer playing the current round
+                console.log(player._name + ' wins with ' + player.showHand())
             }
         });
     }
@@ -137,7 +154,9 @@
         players.forEach(function (player) {
             player._hand = [];
             player.calculateHandValue();
-        })
+            player.addToCurrentRound();
+        });
+        roundEnd = false;
     }
 
     //Play another round?
@@ -177,7 +196,7 @@
         checkNaturals();
         playAgain();
         reset();
-    } while (!playEnd && myDeck._cards.length > 10)
+    } while (!playEnd)
 
 
 })();
